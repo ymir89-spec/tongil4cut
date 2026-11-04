@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d3a63">
+<title>숭실고 통일네컷</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* Layout: one narrow column like a photo-booth kiosk; a step rail of years runs across the top, the finished strip is the hero of the last step. */
+:root {
+  --paper: #eef2f7;
+  --card: #ffffff;
+  --ink: #142238;
+  --muted: #56637a;
+  --line: #d3dbe6;
+  --navy: #1d3a63;
+  --accent: #c42f66;      /* 진달래 */
+  --accent-soft: #fbe4ec;
+  --on-accent: #ffffff;
+  --ok: #1f7a4d;
+  --warn: #a5541a;
+  --t-fact: #2f6fb0; --t-infer: #7a4bb3; --t-judge: #b5531c; --t-create: #1f8a6a;
+  --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0d141f; --card: #162234; --ink: #e6ecf4; --muted: #9ba8bb; --line: #2a3a50;
+  --navy: #9dbbe6; --accent: #f06a9b; --accent-soft: #3a1a29; --on-accent: #1a0b12;
+  --ok: #5cc690; --warn: #f0a66b;
+  --t-fact: #7fb2ea; --t-infer: #b897e6; --t-judge: #f0a06b; --t-create: #6cd2b0;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0d141f; --card: #162234; --ink: #e6ecf4; --muted: #9ba8bb; --line: #2a3a50;
+  --navy: #9dbbe6; --accent: #f06a9b; --accent-soft: #3a1a29; --on-accent: #1a0b12;
+  --ok: #5cc690; --warn: #f0a66b;
+  --t-fact: #7fb2ea; --t-infer: #b897e6; --t-judge: #f0a06b; --t-create: #6cd2b0;
+  color-scheme: dark }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 56px; display: grid; gap: 20px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; line-height: 1.25; }
+p { margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+.brand { display: grid; gap: 2px; min-width: 0; }
+.eyebrow { font-size: 12.5px; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.brand h1 { font-size: clamp(30px, 7vw, 42px); font-weight: 860; letter-spacing: -.03em; }
+.brand h1 b { color: var(--accent); font-weight: 860; }
+.tabs { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 2px; }
+.tabs button { border: 0; background: transparent; padding: 7px 14px; border-radius: 999px; font-weight: 650; color: var(--muted); font-size: 14px; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+
+/* year rail */
+.rail { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; position: relative; }
+.rail::before { content: ""; position: absolute; left: 8%; right: 8%; top: 13px; border-top: 2px dashed var(--line); }
+.rail button { position: relative; background: none; border: 0; display: grid; justify-items: center; gap: 4px; padding: 0; color: var(--muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rail .dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+.rail button.done .dot { background: var(--navy); border-color: var(--navy); color: var(--paper); }
+.rail button.cur { color: var(--ink); }
+.rail button.cur .dot { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 16px; min-width: 0; }
+.label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.field { display: grid; gap: 6px; }
+input[type=text], textarea { width: 100%; border: 1.5px solid var(--line); background: var(--paper); border-radius: 10px; padding: 11px 12px; }
+input[type=text]:focus, textarea:focus { border-color: var(--accent); outline: none; }
+textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+
+.intro h2 { font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+.intro p { color: var(--muted); max-width: 60ch; }
+.howto { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.howto li { border-top: 2px solid var(--ink); padding-top: 8px; font-size: 13.5px; }
+.howto b { display: block; font-size: 13px; color: var(--accent); }
+@media (max-width: 520px) { .howto { grid-template-columns: 1fr; } }
+
+/* scene */
+.scene-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: end; }
+.year { font-size: clamp(44px, 12vw, 64px); font-weight: 900; letter-spacing: -.05em; line-height: .9; color: var(--navy); font-variant-numeric: tabular-nums; grid-row: span 2; }
+.scene-head .k { font-size: 13px; color: var(--muted); font-weight: 650; }
+.scene-head h2 { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+.scene-body { color: var(--ink); max-width: 62ch; }
+.mission { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+.mission b { color: var(--accent); white-space: nowrap; }
+
+.shot { position: relative; aspect-ratio: 4 / 3; max-width: 100%; border-radius: 10px; overflow: hidden; background: repeating-linear-gradient(135deg, var(--paper) 0 12px, var(--card) 12px 24px); border: 1.5px dashed var(--line); display: grid; place-items: center; }
+.shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shot .empty { text-align: center; color: var(--muted); font-size: 14px; padding: 16px; }
+.shot .empty strong { display: block; font-size: 40px; color: var(--line); font-weight: 900; letter-spacing: -.04em; }
+.shot-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.btn { border: 1.5px solid var(--line); background: var(--card); padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 14.5px; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.dark { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.small { padding: 6px 10px; font-size: 13px; }
+.nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.filebtn { position: relative; overflow: hidden; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.types { display: flex; flex-wrap: wrap; gap: 6px; }
+.type { --c: var(--muted); border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font-size: 13.5px; font-weight: 700; color: var(--c); }
+.type[aria-pressed="true"] { background: var(--c); border-color: var(--c); color: var(--card); }
+.type small { font-weight: 500; opacity: .85; margin-left: 4px; }
+.t-fact { --c: var(--t-fact); } .t-infer { --c: var(--t-infer); } .t-judge { --c: var(--t-judge); } .t-create { --c: var(--t-create); }
+.hint { font-size: 13px; color: var(--muted); }
+.hint button { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 700; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+
+/* finish */
+.finish { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 620px) { .finish { grid-template-columns: 1fr; } .finish .strip-wrap { max-width: 320px; margin: 0 auto; } }
+.strip-wrap img { width: 100%; display: block; border-radius: 6px; box-shadow: 0 10px 30px -12px rgba(10, 20, 40, .45); }
+.frames { display: flex; gap: 8px; flex-wrap: wrap; }
+.frame { border: 2px solid var(--line); border-radius: 10px; padding: 6px 10px 6px 6px; background: var(--card); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; }
+.frame i { width: 22px; height: 30px; border-radius: 4px; display: block; border: 1px solid var(--line); }
+.frame[aria-pressed="true"] { border-color: var(--accent); }
+.status { font-size: 14px; padding: 10px 12px; border-radius: 10px; background: var(--paper); }
+.status.ok { color: var(--ok); } .status.err { color: var(--warn); }
+.checklist { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
+.checklist li::before { content: "○ "; color: var(--muted); }
+.checklist li.y::before { content: "● "; color: var(--ok); }
+
+/* teacher */
+.t-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+.stats { display: flex; gap: 18px; font-variant-numeric: tabular-nums; }
+.stats div { display: grid; }
+.stats b { font-size: 28px; font-weight: 850; letter-spacing: -.02em; line-height: 1.1; }
+.stats span { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: var(--card); padding: 8px 12px; font-weight: 700; font-size: 13.5px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.subs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.sub { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; grid-template-columns: 76px minmax(0, 1fr); align-items: start; }
+.sub img { width: 76px; border-radius: 4px; cursor: zoom-in; display: block; }
+.sub h3 { font-size: 15px; font-weight: 800; }
+.sub .meta { font-size: 12px; color: var(--muted); }
+.sub ol { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: grid; gap: 4px; }
+.sub .acts { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 6px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 800; color: var(--c); border: 1px solid var(--c); border-radius: 4px; padding: 0 4px; margin-right: 4px; line-height: 1.5; vertical-align: 1px; }
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .board { grid-template-columns: 1fr; } }
+.col { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.col h3 { font-size: 14px; font-weight: 800; display: flex; justify-content: space-between; gap: 6px; }
+.col h3 span { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+.q { font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 8px; }
+.q .who { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.emptybox { text-align: center; padding: 36px 16px; color: var(--muted); display: grid; gap: 8px; justify-items: center; }
+.emptybox strong { color: var(--ink); font-size: 17px; }
+dialog { border: 0; border-radius: 12px; padding: 12px; background: var(--card); color: var(--ink); max-width: min(92vw, 420px); }
+dialog img { width: 100%; display: block; border-radius: 6px; max-height: 80vh; object-fit: contain; }
+dialog::backdrop { background: rgba(5, 10, 20, .6); }
+.foot { font-size: 12px; color: var(--muted); text-align: center; }
+@media (prefers-reduced-motion: no-preference) { .panel { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(6px); } to { transform: none; } } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">숭실고등학교 · 한국사 · 통일 단원</span>
+      <h1>통일<b>네컷</b></h1>
+    </div>
+  </header>
+
+  <section id="make" class="wrap" style="padding:0">
+    <nav class="rail" id="rail" aria-label="단계"></nav>
+    <div id="stage"></div>
+  </section>
+
+  <section id="teacher" hidden></section>
+
+  <p class="foot">질문으로 찍는 남북의 순간 · 사진은 이 기기에서 네 컷으로 합쳐지고, 제출하면 선생님만 볼 수 있어요. · <a href="#teacher" style="color:inherit">선생님 모아보기</a></p>
+</div>
+<dialog id="zoom"><img id="zoomImg" alt="제출한 네 컷 크게 보기"><div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn small" id="zoomClose">닫기</button></div></dialog>
+
+<script>
+/* ▼ 앱스 스크립트를 웹 앱으로 배포한 뒤 받은 주소(…/exec)를 따옴표 안에 붙여 넣으세요. */
+const API_URL = "";
+/* ▲ */
+
+const SCHOOL = "숭실고등학교";
+const TYPES = [
+  { id: "fact",   name: "사실",  long: "사실 확인", cls: "t-fact",   color: "--t-fact" },
+  { id: "infer",  name: "추론",  long: "추론·상상", cls: "t-infer",  color: "--t-infer" },
+  { id: "judge",  name: "평가",  long: "평가·판단", cls: "t-judge",  color: "--t-judge" },
+  { id: "create", name: "창의",  long: "창의·제안", cls: "t-create", color: "--t-create" },
+];
+const SCENES = [
+  { year: "1953", short: "1953", title: "휴전선이 그어지다",
+    body: "1945년 광복 직후 한반도는 북위 38도선을 경계로 미군과 소련군이 나누어 점령했고, 1948년 남과 북에 각각 정부가 들어섰습니다. 1950년 6·25 전쟁이 일어났고, 1953년 7월 27일 정전협정이 체결되면서 군사분계선(휴전선)과 비무장지대(DMZ)가 생겼습니다.",
+    pose: "두 사람이 등을 맞대고 서거나, 가운데에 팔로 선을 그어 갈라진 장면을 만들어 보세요.",
+    ex: { fact: "정전협정에 서명한 쪽은 누구누구였을까?", infer: "휴전선 근처 마을 사람들의 생활은 어떻게 달라졌을까?", judge: "전쟁이 '종전'이 아니라 '정전'으로 멈춘 것은 지금 우리에게 어떤 의미일까?", create: "DMZ를 앞으로 어떤 공간으로 바꿀 수 있을까?" } },
+  { year: "1972", short: "1972", title: "처음 마주 앉다",
+    body: "1972년 7월 4일, 남과 북은 분단 이후 처음으로 통일 원칙에 합의한 7·4 남북공동성명을 발표했습니다. 자주·평화·민족적 대단결이라는 통일 3대 원칙이 담겼고, 이를 실천하기 위해 남북조절위원회가 만들어졌습니다.",
+    pose: "종이 한 장을 함께 들고 성명을 발표하는 장면을 연출해 보세요.",
+    ex: { fact: "7·4 남북공동성명의 통일 3대 원칙은 무엇일까?", infer: "남과 북은 왜 1972년에 대화를 시작했을까?", judge: "공동성명 이후 남북 관계가 크게 나아지지 못한 이유는 무엇일까?", create: "내가 이 성명에 한 줄을 더한다면 무엇을 넣을까?" } },
+  { year: "2000", short: "2000", title: "만나고 오가다",
+    body: "1991년 남북은 유엔에 동시 가입하고 남북기본합의서를 채택했습니다. 2000년 6월에는 분단 이후 첫 남북정상회담이 열려 6·15 남북공동선언이 발표되었고, 그해 8월 이산가족 방문단이 서울과 평양을 오가며 가족을 만났습니다.",
+    pose: "수십 년 만에 만난 가족처럼 손을 맞잡거나 안아 보세요.",
+    ex: { fact: "6·15 남북공동선언에는 어떤 합의가 담겼을까?", infer: "50년 만에 가족을 만난 사람들은 어떤 이야기를 나눴을까?", judge: "이산가족 상봉이 꾸준히 이어지지 못한 이유는 무엇일까?", create: "이산가족의 기억을 기록으로 남기려면 무엇을 할 수 있을까?" } },
+  { year: "오늘", short: "오늘", title: "우리가 그리는 다음 장면",
+    body: "남북 관계는 대화와 긴장이 되풀이되어 왔습니다. 앞으로의 한반도를 어떻게 그릴지에는 정해진 답이 없습니다. 오늘의 우리가 상상하는 미래의 한 장면을 찍고, 그 장면에 대한 질문을 남겨 보세요.",
+    pose: "자유 포즈. 미래의 뉴스 사진, 함께 가 보고 싶은 장소, 만나고 싶은 사람을 상상해 보세요.",
+    ex: { fact: "지금 남북 사이에 남아 있는 교류나 합의에는 무엇이 있을까?", infer: "통일이 된다면 우리 학교생활은 어떻게 달라질까?", judge: "통일에 대한 생각이 세대마다 다른 이유는 무엇일까?", create: "남북 청소년이 함께할 수 있는 활동을 제안한다면?" } },
+];
+const FRAMES = [
+  { id: "paper",  name: "한지",   bg: "#f4f6f9", ink: "#142238", sub: "#5a6780", acc: "#c42f66", box: "#ffffff" },
+  { id: "night",  name: "밤하늘", bg: "#14243d", ink: "#f2f5fa", sub: "#a9b7cc", acc: "#ff8ab3", box: "#1e3253" },
+  { id: "azalea", name: "진달래", bg: "#d9497c", ink: "#ffffff", sub: "#ffe0ea", acc: "#ffe36b", box: "#c23a6b" },
+];
+const FONT = '"Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif';
+
+const state = {
+  step: 0, name: "", sid: "", members: "", frame: "paper",
+  cuts: SCENES.map(() => ({ img: null, preview: "", qtype: "infer", q: "" })),
+  stripUrl: "", submitted: false,
+};
+try { const d = JSON.parse(localStorage.getItem("tongil4cut-draft") || "null");
+  if (d) { Object.assign(state, { name: d.name || "", sid: d.sid || "", members: d.members || "", frame: d.frame || "paper" });
+    (d.cuts || []).forEach((c, i) => { if (state.cuts[i]) { state.cuts[i].qtype = c.qtype || "infer"; state.cuts[i].q = c.q || ""; } }); } } catch (e) {}
+function saveDraft() { try { localStorage.setItem("tongil4cut-draft", JSON.stringify({ name: state.name, sid: state.sid, members: state.members, frame: state.frame, cuts: state.cuts.map(c => ({ qtype: c.qtype, q: c.q })) })); } catch (e) {} }
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const typeOf = id => TYPES.find(t => t.id === id) || TYPES[1];
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- rail ---------- */
+const RAIL = ["시작", ...SCENES.map(s => s.short), "완성"];
+function renderRail() {
+  $("#rail").innerHTML = RAIL.map((l, i) => {
+    const cls = i === state.step ? "cur" : (i < state.step ? "done" : "");
+    return `<button class="${cls}" data-go="${i}" aria-current="${i === state.step ? "step" : "false"}"><span class="dot">${i === 0 ? "✓" : i === 5 ? "★" : i}</span>${l}</button>`;
+  }).join("");
+  $("#rail").querySelectorAll("button").forEach(b => b.onclick = () => go(+b.dataset.go));
+}
+function go(i) { state.step = Math.max(0, Math.min(5, i)); renderRail(); renderStage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+/* ---------- stages ---------- */
+function renderStage() {
+  const s = state.step;
+  if (s === 0) return renderStart();
+  if (s === 5) return renderFinish();
+  renderCut(s - 1);
+}
+
+function renderStart() {
+  $("#stage").innerHTML = `
+  <div class="panel intro">
+    <h2>질문으로 찍는 남북의 순간</h2>
+    <p>분단에서 오늘까지, 남북 관계의 네 장면을 친구들과 재현해 찍어 보세요. 컷마다 그 장면에 대한 질문을 하나씩 남기면 사진 아래에 함께 새겨집니다.</p>
+    <ul class="howto">
+      <li><b>읽기</b>장면 설명과 포즈 미션을 확인해요</li>
+      <li><b>찍기</b>모둠 친구들과 장면을 재현해 촬영해요</li>
+      <li><b>질문하기</b>질문 유형을 고르고 나만의 질문을 남겨요</li>
+    </ul>
+    <div class="row2">
+      <div class="field"><label class="label" for="f-sid">학번</label><input type="text" id="f-sid" placeholder="예: 20315" value="${esc(state.sid)}" inputmode="numeric" maxlength="12"></div>
+      <div class="field"><label class="label" for="f-name">이름</label><input type="text" id="f-name" placeholder="예: 김숭실" value="${esc(state.name)}" maxlength="20"></div>
+    </div>
+    <div class="field"><label class="label" for="f-members">함께 찍은 모둠원 (선택)</label><input type="text" id="f-members" placeholder="예: 이한빛, 박서진" value="${esc(state.members)}" maxlength="60"></div>
+    <div class="nav"><span class="hint">사진 없이도 디자인을 먼저 볼 수 있어요. <button id="peek">완성 화면 미리 보기</button></span><button class="btn primary" id="startBtn">첫 장면으로 →</button></div>
+  </div>`;
+  const bind = (id, k) => $(id).oninput = e => { state[k] = e.target.value; saveDraft(); };
+  bind("#f-sid", "sid"); bind("#f-name", "name"); bind("#f-members", "members");
+  $("#startBtn").onclick = () => go(1);
+  $("#peek").onclick = () => go(5);
+}
+
+function renderCut(i) {
+  const sc = SCENES[i], c = state.cuts[i], t = typeOf(c.qtype);
+  $("#stage").innerHTML = `
+  <div class="panel">
+    <div class="scene-head"><div class="year">${esc(sc.year)}</div><span class="k">${i + 1}번째 컷</span><h2>${esc(sc.title)}</h2></div>
+    <p class="scene-body">${esc(sc.body)}</p>
+    <div class="mission"><b>포즈 미션</b><span>${esc(sc.pose)}</span></div>
+    <div class="shot" id="shot">${c.preview ? `<img src="${c.preview}" alt="${i + 1}번째 컷 사진">` : `<div class="empty"><strong>${esc(sc.year)}</strong>아직 사진이 없어요</div>`}</div>
+    <div class="shot-btns">
+      <label class="btn dark filebtn">📷 ${c.preview ? "다시 찍기" : "사진 찍기"}<input type="file" accept="image/*" capture="environment" id="cam"></label>
+      <label class="btn filebtn">앨범에서 고르기<input type="file" accept="image/*" id="pick"></label>
+      ${c.preview ? `<button class="btn" id="clearPhoto">사진 지우기</button>` : ""}
+    </div>
+    <div class="field">
+      <span class="label">질문 유형</span>
+      <div class="types" role="group" aria-label="질문 유형">${TYPES.map(x => `<button class="type ${x.cls}" data-t="${x.id}" aria-pressed="${x.id === c.qtype}">${x.long}</button>`).join("")}</div>
+    </div>
+    <div class="field">
+      <label class="label" for="q">이 장면에 대한 나의 질문</label>
+      <textarea id="q" maxlength="80" placeholder="${esc(sc.ex[c.qtype])}">${esc(c.q)}</textarea>
+      <span class="hint"><span id="qcount">${c.q.length}</span>/80자 · 막히면 <button id="useEx">예시로 시작하기</button> (예시를 그대로 두지 말고 내 말로 고쳐 보세요)</span>
+    </div>
+    <div class="nav"><button class="btn" id="prev">← ${i === 0 ? "처음으로" : SCENES[i - 1].short}</button><button class="btn primary" id="next">${i === 3 ? "네 컷 완성하기 →" : SCENES[i + 1].short + " 장면으로 →"}</button></div>
+  </div>`;
+  const onFile = e => { const f = e.target.files && e.target.files[0]; if (f) loadPhoto(f, i); };
+  $("#cam").onchange = onFile; $("#pick").onchange = onFile;
+  if ($("#clearPhoto")) $("#clearPhoto").onclick = () => { c.img = null; c.preview = ""; renderCut(i); };
+  $("#stage").querySelectorAll(".type").forEach(b => b.onclick = () => {
+    c.qtype = b.dataset.t; saveDraft();
+    $("#stage").querySelectorAll(".type").forEach(x => x.setAttribute("aria-pressed", x === b));
+    $("#q").placeholder = sc.ex[c.qtype];
+  });
+  $("#q").oninput = e => { c.q = e.target.value; $("#qcount").textContent = c.q.length; saveDraft(); };
+  $("#useEx").onclick = () => { c.q = sc.ex[c.qtype]; $("#q").value = c.q; $("#qcount").textContent = c.q.length; saveDraft(); $("#q").focus(); };
+  $("#prev").onclick = () => go(i);
+  $("#next").onclick = () => go(i + 2);
+}
+
+function loadPhoto(file, i) {
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    const max = 1400, k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const cv = document.createElement("canvas");
+    cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+    cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+    URL.revokeObjectURL(url);
+    state.cuts[i].img = cv; state.cuts[i].preview = cv.toDataURL("image/jpeg", .8);
+    state.stripUrl = ""; renderCut(i);
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alertInline("사진을 열 수 없어요. 다른 사진으로 다시 시도해 주세요."); };
+  img.src = url;
+}
+function alertInline(msg) { const p = document.createElement("p"); p.className = "status err"; p.textContent = msg; $("#stage .panel")?.prepend(p); }
+
+/* ---------- strip drawing ---------- */
+function wrapLines(ctx, text, maxW, maxLines) {
+  const lines = []; let line = "";
+  const tokens = text.split(/(\s+)/);
+  for (const tok of tokens) {
+    const test = line + tok;
+    if (ctx.measureText(test).width <= maxW) { line = test; continue; }
+    if (line.trim()) { lines.push(line.trim()); line = tok.trimStart(); }
+    while (ctx.measureText(line).width > maxW) { // break long token by characters
+      let cut = line.length; while (cut > 1 && ctx.measureText(line.slice(0, cut)).width > maxW) cut--;
+      lines.push(line.slice(0, cut)); line = line.slice(cut);
+    }
+  }
+  if (line.trim()) lines.push(line.trim());
+  if (lines.length > maxLines) { const kept = lines.slice(0, maxLines); let l = kept[maxLines - 1]; while (ctx.measureText(l + "…").width > maxW && l.length) l = l.slice(0, -1); kept[maxLines - 1] = l + "…"; return kept; }
+  return lines;
+}
+function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+async function drawStrip() {
+  const F = FRAMES.find(f => f.id === state.frame) || FRAMES[0];
+  const W = 600, P = 26, PW = W - P * 2, PH = Math.round(PW * 3 / 4), CAP = 92, HEAD = 128, FOOT = 74, GAP = 18;
+  const H = HEAD + 4 * (PH + CAP) + 3 * GAP + FOOT;
+  const allText = SCHOOL + "통일네컷질문으로찍는남북의순간" + SCENES.map(s => s.year + s.title).join("") + state.cuts.map(c => c.q).join("") + state.name + state.sid + state.members + "사실추론평가창의0123456789.·「」…" + "아직 사진이 없어요";
+  try { await Promise.all([800, 600, 900, 500].map(w => document.fonts.load(`${w} 24px "Pretendard Variable"`, allText))); } catch (e) {}
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+  ctx.fillStyle = F.bg; ctx.fillRect(0, 0, W, H);
+  // header
+  ctx.fillStyle = F.sub; ctx.font = `600 17px ${FONT}`; ctx.textBaseline = "alphabetic";
+  ctx.fillText(SCHOOL + "  ·  한국사", P, 46);
+  ctx.fillStyle = F.ink; ctx.font = `900 50px ${FONT}`;
+  ctx.fillText("통일", P, 102); const tw = ctx.measureText("통일").width;
+  ctx.fillStyle = F.acc; ctx.fillText("네컷", P + tw + 2, 102);
+  ctx.fillStyle = F.sub; ctx.font = `600 15px ${FONT}`; ctx.textAlign = "right";
+  ctx.fillText("질문으로 찍는", W - P, 80); ctx.fillText("남북의 순간", W - P, 100); ctx.textAlign = "left";
+  // cuts
+  let y = HEAD;
+  for (let i = 0; i < 4; i++) {
+    const sc = SCENES[i], c = state.cuts[i], t = typeOf(c.qtype);
+    ctx.save(); roundRect(ctx, P, y, PW, PH, 10); ctx.clip();
+    if (c.img) {
+      const iw = c.img.width, ih = c.img.height, k = Math.max(PW / iw, PH / ih);
+      const dw = iw * k, dh = ih * k; ctx.drawImage(c.img, P + (PW - dw) / 2, y + (PH - dh) / 2, dw, dh);
+    } else {
+      ctx.fillStyle = F.box; ctx.fillRect(P, y, PW, PH);
+      ctx.strokeStyle = F.sub; ctx.globalAlpha = .18; ctx.lineWidth = 2;
+      for (let s = -PH; s < PW; s += 26) { ctx.beginPath(); ctx.moveTo(P + s, y + PH); ctx.lineTo(P + s + PH, y); ctx.stroke(); }
+      ctx.globalAlpha = .32; ctx.fillStyle = F.ink; ctx.font = `900 120px ${FONT}`; ctx.textAlign = "center";
+      ctx.fillText(sc.year, W / 2, y + PH / 2 + 42); ctx.textAlign = "left"; ctx.globalAlpha = 1;
+    }
+    // scrim + label
+    const g = ctx.createLinearGradient(0, y + PH - 90, 0, y + PH); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,.55)");
+    ctx.fillStyle = g; ctx.fillRect(P, y + PH - 90, PW, 90);
+    ctx.restore();
+    ctx.fillStyle = "#ffffff"; ctx.font = `900 30px ${FONT}`; ctx.fillText(sc.year, P + 16, y + PH - 18);
+    const yw = ctx.measureText(sc.year).width;
+    ctx.font = `700 18px ${FONT}`; ctx.fillText(sc.title, P + 16 + yw + 12, y + PH - 22);
+    // caption
+    const cy = y + PH + 12;
+    ctx.fillStyle = F.box; roundRect(ctx, P, cy, PW, CAP - 20, 10); ctx.fill();
+    const tagC = cssTypeColor(t.id, F);
+    ctx.font = `800 13px ${FONT}`; const tagW = ctx.measureText(t.name).width + 14;
+    ctx.fillStyle = tagC; roundRect(ctx, P + 12, cy + 12, tagW, 22, 5); ctx.fill();
+    ctx.fillStyle = "#ffffff"; ctx.fillText(t.name, P + 19, cy + 28);
+    ctx.fillStyle = F.ink; ctx.font = `600 17px ${FONT}`;
+    const q = c.q.trim() || "질문을 아직 쓰지 않았어요";
+    if (!c.q.trim()) ctx.globalAlpha = .45;
+    const lines = wrapLines(ctx, q, PW - tagW - 36, 2);
+    lines.forEach((l, k) => ctx.fillText(l, P + 12 + tagW + 10, cy + 29 + k * 24));
+    ctx.globalAlpha = 1;
+    y += PH + CAP + GAP;
+  }
+  // footer
+  const fy = H - FOOT + 10;
+  ctx.strokeStyle = F.sub; ctx.globalAlpha = .4; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(P, fy - 14); ctx.lineTo(W - P, fy - 14); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+  ctx.fillStyle = F.ink; ctx.font = `800 19px ${FONT}`;
+  const who = [state.sid, state.name].filter(Boolean).join(" ") || "이름을 적어 주세요";
+  ctx.fillText(who, P, fy + 14);
+  if (state.members.trim()) { ctx.fillStyle = F.sub; ctx.font = `500 14px ${FONT}`; ctx.fillText(("with " + state.members.trim()).slice(0, 40), P, fy + 36); }
+  const d = new Date(), ds = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  ctx.fillStyle = F.sub; ctx.font = `600 15px ${FONT}`; ctx.textAlign = "right"; ctx.fillText(ds, W - P, fy + 14); ctx.textAlign = "left";
+  return cv;
+}
+function cssTypeColor(id, F) {
+  const light = { fact: "#2f6fb0", infer: "#7a4bb3", judge: "#b5531c", create: "#1f8a6a" };
+  return light[id];
+}
+/* ---------- finish ---------- */
+async function renderFinish() {
+  const filled = state.cuts.filter(c => c.img).length, asked = state.cuts.filter(c => c.q.trim()).length, named = !!(state.name.trim() && state.sid.trim());
+  $("#stage").innerHTML = `
+  <div class="panel">
+    <div class="finish">
+      <div class="strip-wrap"><img id="strip" alt="완성된 통일네컷"></div>
+      <div style="display:grid;gap:16px;min-width:0">
+        <div><h2 style="font-size:22px;font-weight:800">네 컷 완성</h2><p class="hint">프레임을 고르고, 선생님께 제출하거나 이미지로 저장하세요.</p></div>
+        <div class="field"><span class="label">프레임</span><div class="frames">${FRAMES.map(f => `<button class="frame" data-f="${f.id}" aria-pressed="${f.id === state.frame}"><i style="background:${f.bg}"></i>${f.name}</button>`).join("")}</div></div>
+        <ul class="checklist">
+          <li class="${named ? "y" : ""}">학번·이름 ${named ? "입력됨" : "<button class='btn small' id='toStart'>입력하러 가기</button>"}</li>
+          <li class="${filled === 4 ? "y" : ""}">사진 ${filled}/4장</li>
+          <li class="${asked === 4 ? "y" : ""}">질문 ${asked}/4개</li>
+        </ul>
+        <div class="shot-btns">
+          <button class="btn primary" id="submit">선생님께 제출</button>
+          <button class="btn" id="save">이미지 저장</button>
+          <button class="btn" id="back">← 오늘 장면 고치기</button>
+        </div>
+        <p class="status" id="status" hidden></p>
+      </div>
+    </div>
+  </div>`;
+  $("#stage").querySelectorAll(".frame").forEach(b => b.onclick = () => { state.frame = b.dataset.f; saveDraft(); renderFinish(); });
+  if ($("#toStart")) $("#toStart").onclick = () => go(0);
+  $("#back").onclick = () => go(4);
+  $("#submit").onclick = submit;
+  $("#save").onclick = saveImage;
+  if (!API_URL) setStatus("아직 제출 주소가 설정되지 않았어요. 이미지를 저장해 선생님께 보내 주세요.", "err");
+  const cv = await drawStrip();
+  state.stripCanvas = cv; state.stripUrl = cv.toDataURL("image/png");
+  $("#strip").src = state.stripUrl;
+}
+function setStatus(msg, kind) { const s = $("#status"); if (!s) return; s.hidden = false; s.className = "status " + (kind || ""); s.textContent = msg; }
+
+function jpegUnder(cv, width, maxChars) {
+  const h = Math.round(cv.height * width / cv.width);
+  const t = document.createElement("canvas"); t.width = width; t.height = h; t.getContext("2d").drawImage(cv, 0, 0, width, h);
+  for (const q of [.8, .68, .56, .45, .35, .26]) { const u = t.toDataURL("image/jpeg", q); if (u.length < maxChars) return u; }
+  return t.toDataURL("image/jpeg", .2);
+}
+
+async function api(body) {
+  const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(body) }); // text/plain: no CORS preflight
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || "요청을 처리하지 못했어요.");
+  return data;
+}
+
+async function submit() {
+  if (!API_URL) { setStatus("아직 제출 주소가 설정되지 않았어요. 이미지를 저장해 선생님께 보내 주세요.", "err"); return; }
+  if (!state.name.trim() || !state.sid.trim()) { setStatus("학번과 이름을 먼저 적어 주세요.", "err"); return; }
+  if (state.cuts.some(c => !c.q.trim())) { setStatus("네 컷 모두 질문을 적어야 제출할 수 있어요.", "err"); return; }
+  const btn = $("#submit"); btn.disabled = true; setStatus("제출하는 중… 화면을 닫지 말아 주세요.", "");
+  try {
+    const cv = state.stripCanvas || await drawStrip();
+    await api({
+      action: "submit",
+      name: state.name.trim().slice(0, 20), sid: state.sid.trim().slice(0, 12), members: state.members.trim().slice(0, 60),
+      frame: state.frame, photos: state.cuts.filter(c => c.img).length,
+      cuts: state.cuts.map(c => ({ qtype: c.qtype, q: c.q.trim().slice(0, 80) })),
+      image: jpegUnder(cv, 600, 900000),
+      thumb: jpegUnder(cv, 260, 48000),
+    });
+    setStatus("제출했어요. 고칠 곳이 있으면 고친 뒤 다시 제출해도 돼요.", "ok");
+  } catch (e) {
+    setStatus("제출하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요. 계속 안 되면 이미지를 저장해 선생님께 보내 주세요.", "err");
+  } finally { btn.disabled = false; }
+}
+
+async function saveImage() {
+  const cv = state.stripCanvas || await drawStrip();
+  const fname = `통일네컷_${(state.sid + state.name).trim() || "우리모둠"}.png`;
+  const blob = await new Promise(r => cv.toBlob(r, "image/png"));
+  const file = new File([blob], fname, { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "통일네컷" }); setStatus("공유 창을 열었어요. '이미지 저장'이나 원하는 앱을 고르세요.", "ok"); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  setStatus("저장했어요. 저장이 안 되면 완성 이미지를 길게 눌러 저장하세요.", "ok");
+}
+
+/* ---------- teacher ---------- */
+const T = { subs: [], view: "cards", filter: "all", loading: false, error: "", armed: null, pw: "", updated: 0, timer: null };
+try { T.pw = sessionStorage.getItem("tongil4cut-pw") || ""; } catch (e) {}
+
+function renderLogin(msg) {
+  $("#teacher").innerHTML = `<form class="panel" id="loginForm" style="max-width:420px">
+    <h2 style="font-size:20px;font-weight:800">선생님 모아보기</h2>
+    <p class="hint">앱스 스크립트에 정해 둔 비밀번호를 입력하세요.</p>
+    <div class="field"><label class="label" for="pw">비밀번호</label><input type="text" id="pw" autocomplete="off" style="-webkit-text-security:disc"></div>
+    ${msg ? `<p class="status err">${esc(msg)}</p>` : ""}
+    <div class="nav"><button class="btn" type="button" id="toMake">← 학생 화면</button><button class="btn primary" type="submit">열기</button></div>
+  </form>`;
+  $("#toMake").onclick = () => { location.hash = ""; };
+  $("#loginForm").onsubmit = e => { e.preventDefault(); T.pw = $("#pw").value.trim(); if (T.pw) loadSubs(true); };
+}
+
+async function loadSubs(first) {
+  if (!API_URL) { $("#teacher").innerHTML = `<div class="panel emptybox"><strong>제출 주소가 아직 설정되지 않았어요</strong><span>index.html 맨 위의 API_URL에 앱스 스크립트 웹 앱 주소를 넣어 주세요.</span></div>`; return; }
+  if (first) { T.loading = true; renderTeacher(); }
+  try {
+    const data = await api({ action: "list", password: T.pw });
+    T.subs = data.items.sort((a, b) => (b.at || 0) - (a.at || 0));
+    T.error = ""; T.loading = false; T.updated = Date.now();
+    try { sessionStorage.setItem("tongil4cut-pw", T.pw); } catch (e) {}
+    renderTeacher();
+    clearTimeout(T.timer); T.timer = setTimeout(() => { if (location.hash === "#teacher") loadSubs(false); }, 30000);
+  } catch (e) {
+    T.loading = false;
+    if (/비밀번호/.test(e.message)) { try { sessionStorage.removeItem("tongil4cut-pw"); } catch (x) {} T.pw = ""; renderLogin("비밀번호가 맞지 않아요."); }
+    else { T.error = "불러오지 못했어요. 잠시 후 '새로고침'을 눌러 주세요."; renderTeacher(); }
+  }
+}
+
+function renderTeacher() {
+  const el = $("#teacher");
+  const n = T.subs.length, qn = T.subs.reduce((a, s) => a + (s.cuts || []).filter(c => c.q).length, 0);
+  let body = "";
+  if (T.loading) body = `<div class="panel emptybox"><strong>제출물을 불러오는 중…</strong></div>`;
+  else if (T.error) body = `<div class="panel emptybox"><strong>${esc(T.error)}</strong></div>`;
+  else if (!n) body = `<div class="panel emptybox"><strong>아직 제출된 네컷이 없어요</strong><span>학생들이 '선생님께 제출'을 누르면 여기에 쌓입니다. 30초마다 자동으로 새로 불러와요.</span></div>`;
+  else if (T.view === "cards") body = `<div class="subs">${T.subs.map(s => `
+    <article class="sub">
+      <img src="${esc(s.thumb)}" alt="${esc(s.name)}의 네컷" data-zoom>
+      <div style="min-width:0"><h3>${esc(s.sid)} ${esc(s.name)}</h3><div class="meta">${esc(timeAgo(s.at))}${s.members ? " · with " + esc(s.members) : ""}${s.imageUrl ? ` · <a href="${esc(s.imageUrl)}" target="_blank" rel="noopener">원본</a>` : ""}</div>
+        <ol>${(s.cuts || []).map(c => `<li><span class="tag ${typeOf(c.qtype).cls}">${typeOf(c.qtype).name}</span>${esc(c.q)}</li>`).join("")}</ol></div>
+      <div class="acts"><button class="btn small" data-del="${esc(s.id)}">${T.armed === s.id ? "정말 삭제" : "삭제"}</button></div>
+    </article>`).join("")}</div>`;
+  else body = `<div class="types" role="group" aria-label="유형 거르기">
+      <button class="type" data-flt="all" aria-pressed="${T.filter === "all"}">전체</button>
+      ${TYPES.map(t => `<button class="type ${t.cls}" data-flt="${t.id}" aria-pressed="${T.filter === t.id}">${t.long}</button>`).join("")}
+    </div>
+    <div class="board">${SCENES.map((sc, i) => { const qs = T.subs.map(s => ({ s, c: (s.cuts || [])[i] })).filter(x => x.c && x.c.q && (T.filter === "all" || x.c.qtype === T.filter));
+      return `<div class="col"><h3>${esc(sc.year)} ${esc(sc.title)}<span>${qs.length}</span></h3>${qs.map(x => `<div class="q"><span class="tag ${typeOf(x.c.qtype).cls}">${typeOf(x.c.qtype).name}</span>${esc(x.c.q)}<span class="who">${esc(x.s.sid)} ${esc(x.s.name)}</span></div>`).join("") || `<div class="q hint">해당하는 질문이 없어요</div>`}</div>`; }).join("")}</div>`;
+  el.innerHTML = `<div style="display:grid;gap:16px">
+    <div class="t-head">
+      <div class="stats"><div><b>${n}</b><span>제출</span></div><div><b>${qn}</b><span>질문</span></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="seg"><button data-v="cards" aria-pressed="${T.view === "cards"}">제출물</button><button data-v="board" aria-pressed="${T.view === "board"}">질문 보드</button></div>
+        <button class="btn small" id="reload">새로고침</button>
+        <button class="btn small" id="copyAll" ${n ? "" : "disabled"}>질문 표로 복사</button>
+      </div>
+    </div>
+    <p class="status" id="tstatus" hidden></p>
+    ${body}
+    <p class="hint">${T.updated ? "마지막으로 불러온 시각 " + new Date(T.updated).toLocaleTimeString("ko-KR") + " · " : ""}전체 기록은 구글 시트에서도 볼 수 있어요.</p></div>`;
+  el.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { T.view = b.dataset.v; renderTeacher(); });
+  el.querySelectorAll("[data-flt]").forEach(b => b.onclick = () => { T.filter = b.dataset.flt; renderTeacher(); });
+  el.querySelectorAll("[data-zoom]").forEach(img => img.onclick = () => { $("#zoomImg").src = img.src; $("#zoom").showModal(); });
+  $("#reload").onclick = () => loadSubs(false);
+  el.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
+    const id = b.dataset.del;
+    if (T.armed !== id) { T.armed = id; renderTeacher(); return; }
+    T.armed = null; b.disabled = true;
+    try { await api({ action: "delete", password: T.pw, id }); T.subs = T.subs.filter(s => s.id !== id); renderTeacher(); tStatus("삭제했어요."); }
+    catch (e) { renderTeacher(); tStatus("삭제하지 못했어요. 잠시 후 다시 시도해 주세요."); }
+  });
+  const cp = $("#copyAll"); if (cp) cp.onclick = async () => {
+    const rows = [["학번", "이름", "모둠원", ...SCENES.flatMap(s => [s.year + " 유형", s.year + " 질문"])]];
+    T.subs.forEach(s => rows.push([s.sid, s.name, s.members || "", ...SCENES.flatMap((_, i) => { const c = (s.cuts || [])[i] || {}; return [typeOf(c.qtype).long, c.q || ""]; })]));
+    const tsv = rows.map(r => r.map(v => String(v).replace(/[\t\n]/g, " ")).join("\t")).join("\n");
+    try { await navigator.clipboard.writeText(tsv); tStatus("복사했어요. 스프레드시트에 붙여 넣으면 표가 됩니다."); }
+    catch (e) { tStatus("복사하지 못했어요. 구글 시트에서 직접 확인해 주세요."); }
+  };
+}
+function tStatus(m) { const s = $("#tstatus"); if (s) { s.hidden = false; s.textContent = m; } }
+function timeAgo(t) { if (!t) return ""; const m = Math.round((Date.now() - t) / 60000); if (m < 1) return "방금"; if (m < 60) return m + "분 전"; const h = Math.round(m / 60); if (h < 24) return h + "시간 전"; const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`; }
+$("#zoomClose").onclick = () => $("#zoom").close();
+
+/* ---------- routing: #teacher opens the teacher view ---------- */
+function route() {
+  const teacher = location.hash === "#teacher";
+  $("#make").hidden = teacher; $("#teacher").hidden = !teacher;
+  if (teacher) { if (T.pw) loadSubs(true); else renderLogin(); }
+  else clearTimeout(T.timer);
+}
+window.addEventListener("hashchange", route);
+
+renderRail(); renderStage(); route();
+</script>
+</body>
+</html>
